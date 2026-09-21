@@ -11,7 +11,7 @@ def create_event(title, event_date):
 
 # Расчёт количества дней до события
 def days_until(event_date, today):
-    gap = event_date - today
+    gap = abs(event_date - today)
     return gap.days
 
 
