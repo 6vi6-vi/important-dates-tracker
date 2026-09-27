@@ -32,7 +32,7 @@ def create_new_event(
     categories: List[Category],
     users: List[User],
 ) -> None:
-    """Создать событие через пользовательский сценарий."""
+    """Создать событие."""
     user_id = input_int("id пользователя: ")
     user = storage.find_user_by_id(users, user_id)
     if user is None:
@@ -61,7 +61,7 @@ def create_new_event(
 def create_new_reminder(
     reminders: List[Reminder], events: List[Event]
 ) -> None:
-    """Создать напоминание через пользовательский сценарий."""
+    """Создать напоминание."""
     event_id = input_int("id события: ")
     event = storage.find_event_by_id(events, event_id)
     if event is None:
@@ -172,7 +172,7 @@ def main() -> None:
             storage.save_users(USERS_FILE, users)
             storage.save_events(EVENTS_FILE, events)
             storage.save_reminders(REMINDERS_FILE, reminders)
-            print("Данные сохранены. До встречи!")
+            print("Данные сохранены.")
             break
         else:
             print("Неизвестное действие.")

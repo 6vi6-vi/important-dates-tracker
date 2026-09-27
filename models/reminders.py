@@ -62,7 +62,7 @@ def cancel_reminder(reminders: List[Reminder], reminder_id: int) -> bool:
 
 
 def get_reminder(title: str, days_left: int, remind_before: int) -> str:
-    """Сформировать текст напоминания (логика из ПР1/ПР2)."""
+    """Сформировать текст напоминания."""
     if days_left < 0:
         return f"Событие «{title}» прошло ({abs(days_left)} дн. назад)."
     if days_left == 0:
@@ -73,7 +73,7 @@ def get_reminder(title: str, days_left: int, remind_before: int) -> str:
 
 
 def get_booking_status(is_available: bool) -> str:
-    """Текстовый статус (функция, перенесённая из ПР1)."""
+    """Текстовый статус."""
     if is_available:
         return "Событие можно запланировать"
     return "Событие уже наступило"

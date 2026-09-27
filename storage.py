@@ -4,7 +4,6 @@ import json
 from typing import List
 
 from models import Category, Event, Reminder, User
-from models.events import find_events  # noqa: F401
 
 
 def load_categories(filename: str) -> List[Category]:

@@ -14,5 +14,13 @@
         "category_id": 2,
         "user_id": 2,
         "is_recurring": true
+    },
+    {
+        "id": 3,
+        "title": "Дедлайн",
+        "event_date": "2026-10-04",
+        "category_id": 3,
+        "user_id": 2,
+        "is_recurring": false
     }
 ]
