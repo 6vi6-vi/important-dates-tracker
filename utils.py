@@ -13,7 +13,7 @@ def input_int(prompt: str) -> int:
 
 
 def input_date(prompt: str) -> date:
-    """Запросить у пользователя дату в формате ДД.ММ.ГГГГ."""
+    """Запросить дату в формате ДД.ММ.ГГГГ."""
     while True:
         try:
             return datetime.strptime(input(prompt), "%d.%m.%Y").date()
@@ -22,7 +22,7 @@ def input_date(prompt: str) -> date:
 
 
 def input_bool(prompt: str) -> bool:
-    """Запросить у пользователя ответ да/нет."""
+    """Запросить ответ да/нет."""
     while True:
         answer = input(prompt).strip().lower()
         if answer in ("да", "д", "y", "yes"):
