@@ -1,6 +1,6 @@
 from datetime import date
 
-from reminders import (
+from models.reminders import (
     add_reminder,
     cancel_reminder,
     days_until,

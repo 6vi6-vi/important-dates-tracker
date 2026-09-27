@@ -3,13 +3,13 @@
 from datetime import date
 
 import storage
-from events import (
+from models.events import (
     add_event,
     delete_event,
     filter_events_by_category,
     find_events,
 )
-from reminders import (
+from models.reminders import (
     add_reminder,
     cancel_reminder,
     upcoming_events,

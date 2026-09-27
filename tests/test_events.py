@@ -1,6 +1,6 @@
 from datetime import date
 
-from events import (
+from models.events import (
     add_event,
     delete_event,
     filter_events_by_category,
