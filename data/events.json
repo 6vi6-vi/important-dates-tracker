@@ -12,5 +12,11 @@
         "event_date": "2026-12-20",
         "category": "Годовщина",
         "is_recurring": true
+    },
+    {
+        "title": "Дедлайн по ПКС",
+        "event_date": "2026-09-30",
+        "category": "Дедлайн",
+        "is_recurring": false
     }
 ]

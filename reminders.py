@@ -2,8 +2,6 @@
 
 from datetime import date
 
-from events import find_events  # noqa: F401  (сохранено для преемственности)
-
 
 def days_until(event_date: str, today: date) -> int:
     """Вернуть количество дней от сегодня до события."""
@@ -25,7 +23,7 @@ def get_reminder(
 
 
 def get_booking_status(is_available: bool) -> str:
-    """Текстовый статус (функция, перенесённая из ПР1)."""
+    """Текстовый статус"""
     if is_available:
         return "Событие можно запланировать"
     return "Событие уже наступило"

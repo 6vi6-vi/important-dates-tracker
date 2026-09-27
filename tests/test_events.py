@@ -34,10 +34,10 @@ def test_filter_events_by_category():
 
 def test_sort_events_by_date():
     events = {}
-    add_event(events, "Позже", date(2026, 12, 20), "Семья", True)
-    add_event(events, "Раньше", date(2026, 10, 5), "Работа", False)
+    add_event(events, "Праздник2", date(2026, 12, 20), "Семья", True)
+    add_event(events, "Праздник1", date(2026, 10, 5), "Работа", False)
     ordered = sort_events_by_date(events)
-    assert ordered[0]["title"] == "Раньше"
+    assert ordered[0]["title"] == "Праздник1"
 
 
 def test_delete_event():
