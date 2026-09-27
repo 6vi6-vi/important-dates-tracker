@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "title": "День рождения друга",
+        "event_date": "2026-10-05",
+        "category": "День рождения",
+        "is_recurring": true
+    },
+    {
+        "id": 2,
+        "title": "Годовщина свадьбы",
+        "event_date": "2026-12-20",
+        "category": "Годовщина",
+        "is_recurring": true
+    }
+]
