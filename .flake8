@@ -5,6 +5,10 @@ exclude =
     .venv,
     venv,
     env,
+    build,
+    dist,
     .idea,
-    .mypy_cache
-max-line-length = 88
+    migrations
+max-line-length = 95
+per-file-ignores =
+    */__init__.py: F401

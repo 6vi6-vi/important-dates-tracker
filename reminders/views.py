@@ -5,7 +5,6 @@ from datetime import date
 from django.http import HttpRequest, HttpResponse
 
 from homepage.views import page
-from models import Reminder  # noqa: F401  (тип для аннотаций)
 from models.reminders import (
     find_reminder_by_id,
     sort_reminders_by_date,

@@ -32,6 +32,11 @@ env.bak/
 venv.bak/
 .python-version
 
+# Django
+*.log
+db.sqlite3
+*.sqlite3
+
 # ===== PyInstaller =====
 *.manifest
 *.spec
@@ -64,6 +69,7 @@ htmlcov/
 *.code-workspace
 
 # ===== Windows =====
+.DS_Store
 Thumbs.db
 Thumbs.db:encryptable
 ehthumbs.db
