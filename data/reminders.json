@@ -2,7 +2,17 @@
     {
         "id": 1,
         "event_id": 1,
+        "user_id": 1,
         "remind_before": 7,
-        "is_sent": false
+        "is_sent": false,
+        "is_active": true
+    },
+    {
+        "id": 2,
+        "event_id": 2,
+        "user_id": 2,
+        "remind_before": 14,
+        "is_sent": false,
+        "is_active": true
     }
 ]

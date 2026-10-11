@@ -16,7 +16,8 @@ def load_categories(filename: str) -> List[Category]:
     except json.JSONDecodeError:
         return []
     return [
-        Category(category_id=item["id"], name=item["name"]) for item in raw
+        Category(category_id=item["id"], name=item["name"])
+        for item in raw
     ]
 
 
@@ -66,20 +67,12 @@ def find_category_by_id(
     return None
 
 
-def find_event_by_id(events: List[Event], event_id: int) -> Event | None:
-    """Найти событие по идентификатору."""
-    for event in events:
-        if event.id == event_id:
-            return event
-    return None
-
-
 def load_events(
     filename: str,
     categories: List[Category],
     users: List[User],
 ) -> List[Event]:
-    """Загрузить события из JSON и восстановить связи."""
+    """Загрузить события и восстановить связи."""
     try:
         with open(filename, "r", encoding="utf-8") as file:
             raw = json.load(file)
@@ -101,7 +94,7 @@ def load_events(
                 event_date=item["event_date"],
                 category=category,
                 user=user,
-                is_recurring=item["is_recurring"],
+                is_recurring=item.get("is_recurring", False),
             )
         )
     return events
@@ -127,8 +120,9 @@ def save_events(filename: str, events: List[Event]) -> None:
 def load_reminders(
     filename: str,
     events: List[Event],
+    users: List[User],
 ) -> List[Reminder]:
-    """Загрузить напоминания и восстановить связи с событиями."""
+    """Загрузить напоминания и восстановить связи."""
     try:
         with open(filename, "r", encoding="utf-8") as file:
             raw = json.load(file)
@@ -139,30 +133,26 @@ def load_reminders(
 
     reminders: List[Reminder] = []
     for item in raw:
-        event = find_event_by_id(events, item["event_id"])
-        if event is None:
-            continue
-        reminders.append(
-            Reminder(
-                reminder_id=item["id"],
-                event=event,
-                remind_before=item["remind_before"],
-                is_sent=item.get("is_sent", False),
-            )
-        )
+        reminder = Reminder.from_data(item, events, users)
+        if reminder is not None:
+            reminders.append(reminder)
     return reminders
 
 
-def save_reminders(filename: str, reminders: List[Reminder]) -> None:
+def save_reminders(
+    filename: str, reminders: List[Reminder]
+) -> None:
     """Сохранить напоминания в JSON-файл."""
     data = [
         {
-            "id": reminder.id,
-            "event_id": reminder.event.id,
-            "remind_before": reminder.remind_before,
-            "is_sent": reminder.is_sent,
+            "id": r.id,
+            "event_id": r.event.id,
+            "user_id": r.user.id,
+            "remind_before": r.remind_before,
+            "is_sent": r.is_sent,
+            "is_active": r.is_active,
         }
-        for reminder in reminders
+        for r in reminders
     ]
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(data, file, ensure_ascii=False, indent=4)

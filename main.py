@@ -1,23 +1,21 @@
-"""Точка запуска сервиса учёта важных дат."""
+"""Точка запуска сервиса учёта важных дат (консольная версия)."""
 
 from datetime import date
-from typing import List
 
 import storage
 from models import Category, Event, Reminder, User
 from models.events import (
     add_event,
-    delete_event,
-    filter_events_by_category,
-    find_events,
+    find_event_by_id,
     show_events,
     sort_events_by_date,
 )
 from models.reminders import (
     add_reminder,
     cancel_reminder,
+    filter_active_reminders,
+    get_due_reminders,
     show_reminders,
-    upcoming_events,
 )
 from utils import input_bool, input_date, input_int
 
@@ -27,28 +25,49 @@ EVENTS_FILE = "data/events.json"
 REMINDERS_FILE = "data/reminders.json"
 
 
-def create_new_event(
-    events: List[Event],
-    categories: List[Category],
-    users: List[User],
+def create_new_reminder(
+    reminders: list[Reminder],
+    events: list[Event],
+    users: list[User],
 ) -> None:
-    """Создать событие."""
+    """Создать напоминание через пользовательский сценарий."""
+    event_id = input_int("id события: ")
+    event = find_event_by_id(events, event_id)
+    if event is None:
+        print("Событие не найдено.")
+        return
     user_id = input_int("id пользователя: ")
     user = storage.find_user_by_id(users, user_id)
     if user is None:
         print("Пользователь не найден.")
         return
+    remind_before = input_int("Напомнить за сколько дней: ")
+    reminder = add_reminder(reminders, event, user, remind_before)
+    if reminder is None:
+        print("Некорректный срок напоминания.")
+        return
+    print(f"Напоминание добавлено, id = {reminder.id}.")
 
+
+def create_new_event(
+    events: list[Event],
+    categories: list[Category],
+    users: list[User],
+) -> None:
+    """Создать событие через пользовательский сценарий."""
+    user_id = input_int("id пользователя: ")
+    user = storage.find_user_by_id(users, user_id)
+    if user is None:
+        print("Пользователь не найден.")
+        return
     category_id = input_int("id категории: ")
     category = storage.find_category_by_id(categories, category_id)
     if category is None:
         print("Категория не найдена.")
         return
-
     title = input("Название события: ")
     event_date = input_date("Дата (ДД.ММ.ГГГГ): ").isoformat()
     is_recurring = input_bool("Ежегодное? (да/нет): ")
-
     event = add_event(
         events, title, event_date, category, user, is_recurring
     )
@@ -58,70 +77,33 @@ def create_new_event(
     print(f"Событие добавлено, id = {event.id}.")
 
 
-def create_new_reminder(
-    reminders: List[Reminder], events: List[Event]
-) -> None:
-    """Создать напоминание."""
-    event_id = input_int("id события: ")
-    event = storage.find_event_by_id(events, event_id)
-    if event is None:
-        print("Событие не найдено.")
+def show_due(reminders: list[Reminder]) -> None:
+    """Вывести напоминания, которые пора показать."""
+    due = get_due_reminders(reminders, date.today())
+    if not due:
+        print("Сегодня напоминаний нет.")
         return
-    remind_before = input_int("Напомнить за сколько дней: ")
-    reminder = add_reminder(reminders, event, remind_before)
-    print(f"Напоминание добавлено, id = {reminder.id}.")
-
-
-def show_upcoming(events: List[Event]) -> None:
-    """Вывести предстоящие события с напоминаниями."""
-    today = date.today()
-    upcoming = upcoming_events(events, today)
-    if not upcoming:
-        print("Предстоящих событий нет.")
-        return
-    for event, days in upcoming:
-        print(f"{event.title} — через {days} дн.")
-
-
-def show_users(users: List[User]) -> None:
-    """Вывести список пользователей."""
-    if not users:
-        print("Список пользователей пуст.")
-        return
-    for user in users:
-        print(user)
-
-
-def show_categories(categories: List[Category]) -> None:
-    """Вывести список категорий."""
-    if not categories:
-        print("Список категорий пуст.")
-        return
-    for category in categories:
-        print(category)
+    for reminder in due:
+        print(reminder)
 
 
 def main() -> None:
-    """Основной цикл меню приложения."""
+    """Основной цикл меню консольного приложения."""
     categories = storage.load_categories(CATEGORIES_FILE)
     users = storage.load_users(USERS_FILE)
     events = storage.load_events(EVENTS_FILE, categories, users)
-    reminders = storage.load_reminders(REMINDERS_FILE, events)
+    reminders = storage.load_reminders(REMINDERS_FILE, events, users)
 
     menu = (
-        "\n=== Сервис учёта важных дат ===\n"
-        "1. Показать события\n"
-        "2. Добавить событие\n"
-        "3. Найти событие по названию\n"
-        "4. Фильтр по категории\n"
-        "5. Показать предстоящие события\n"
-        "6. Сортировать события по дате\n"
-        "7. Добавить напоминание\n"
-        "8. Показать напоминания\n"
-        "9. Удалить событие\n"
-        "10. Отменить напоминание\n"
-        "11. Показать пользователей\n"
-        "12. Показать категории\n"
+        "\n=== Сервис учёта важных дат (консоль) ===\n"
+        "1. Показать напоминания\n"
+        "2. Добавить напоминание\n"
+        "3. Показать сработавшие напоминания\n"
+        "4. Показать только активные\n"
+        "5. Отменить напоминание\n"
+        "6. Показать события\n"
+        "7. Добавить событие\n"
+        "8. Сортировать события по дате\n"
         "0. Выход\n"
     )
 
@@ -130,49 +112,31 @@ def main() -> None:
         choice = input_int("Выберите действие: ")
 
         if choice == 1:
-            show_events(events)
-        elif choice == 2:
-            create_new_event(events, categories, users)
-        elif choice == 3:
-            query = input("Подстрока названия: ")
-            show_events(find_events(events, query))
-        elif choice == 4:
-            category_id = input_int("id категории: ")
-            category = storage.find_category_by_id(categories, category_id)
-            if category is None:
-                print("Категория не найдена.")
-            else:
-                show_events(filter_events_by_category(events, category))
-        elif choice == 5:
-            show_upcoming(events)
-        elif choice == 6:
-            show_events(sort_events_by_date(events))
-        elif choice == 7:
-            create_new_reminder(reminders, events)
-        elif choice == 8:
             show_reminders(reminders)
-        elif choice == 9:
-            event_id = input_int("id события для удаления: ")
-            if delete_event(events, event_id):
-                print("Событие удалено.")
-            else:
-                print("Событие не найдено.")
-        elif choice == 10:
+        elif choice == 2:
+            create_new_reminder(reminders, events, users)
+        elif choice == 3:
+            show_due(reminders)
+        elif choice == 4:
+            show_reminders(filter_active_reminders(reminders))
+        elif choice == 5:
             reminder_id = input_int("id напоминания: ")
             if cancel_reminder(reminders, reminder_id):
                 print("Напоминание отменено.")
             else:
                 print("Напоминание не найдено.")
-        elif choice == 11:
-            show_users(users)
-        elif choice == 12:
-            show_categories(categories)
+        elif choice == 6:
+            show_events(events)
+        elif choice == 7:
+            create_new_event(events, categories, users)
+        elif choice == 8:
+            show_events(sort_events_by_date(events))
         elif choice == 0:
             storage.save_categories(CATEGORIES_FILE, categories)
             storage.save_users(USERS_FILE, users)
             storage.save_events(EVENTS_FILE, events)
             storage.save_reminders(REMINDERS_FILE, reminders)
-            print("Данные сохранены.")
+            print("Данные сохранены. До встречи!")
             break
         else:
             print("Неизвестное действие.")
