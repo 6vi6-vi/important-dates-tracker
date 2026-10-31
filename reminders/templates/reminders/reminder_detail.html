@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if reminder %}
+        Напоминание №{{ reminder.id }} – Important Dates Tracker
+    {% else %}
+        Напоминание не найдено
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if reminder %}
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">Напоминание №{{ reminder.id }}</h1>
+                <p class="card-text"><strong>Событие:</strong> {{ reminder.event.title }}</p>
+                <p class="card-text"><strong>Дата события:</strong> {{ reminder.event.event_date }}</p>
+                <p class="card-text"><strong>Пользователь:</strong> {{ reminder.user.name }} ({{ reminder.user.email }})</p>
+                <p class="card-text"><strong>Напомнить за:</strong> {{ reminder.remind_before }} дн.</p>
+                <p class="card-text"><strong>Осталось дней:</strong> {{ reminder.days_left(today) }}</p>
+                <p class="card-text">
+                    <strong>Состояние:</strong>
+                    {% include "reminders/includes/reminder_status.html" %}
+                </p>
+            </div>
+        </div>
+    {% else %}
+        <h1 class="text-danger">Напоминание не найдено</h1>
+        <p>Напоминание с указанным идентификатором отсутствует.</p>
+    {% endif %}
+    <a href="{% url 'reminders:list' %}" class="btn btn-outline-secondary mt-3">← к списку напоминаний</a>
+{% endblock %}

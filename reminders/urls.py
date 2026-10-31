@@ -1,14 +1,9 @@
-"""Маршруты приложения reminders."""
-
 from django.urls import path
-
 from . import views
 
+app_name = "reminders"
+
 urlpatterns = [
-    path("", views.reminders, name="reminders"),
-    path(
-        "<int:reminder_id>/",
-        views.reminder_detail,
-        name="reminder_detail",
-    ),
+    path("", views.reminders, name="list"),
+    path("<int:reminder_id>/", views.reminder_detail, name="detail"),
 ]

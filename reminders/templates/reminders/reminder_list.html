@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Напоминания – Important Dates Tracker
+{% endblock %}
+
+{% block content %}
+    <h1>Напоминания</h1>
+    <p>Всего напоминаний: {{ reminders|length }}</p>
+
+    <div class="list-group">
+        {% for reminder in reminders %}
+            {% include "reminders/includes/reminder_card.html" %}
+        {% empty %}
+            <p>Напоминаний нет.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

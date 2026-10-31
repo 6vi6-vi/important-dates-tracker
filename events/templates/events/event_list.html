@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}
+    События – Important Dates Tracker
+{% endblock %}
+
+{% block content %}
+    <h1>События</h1>
+    <p>Всего событий: {{ events|length }}</p>
+
+    <div class="list-group">
+        {% for event in events %}
+            <div class="list-group-item">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ event.title|default:"Без названия" }}</h5>
+                    <span class="badge bg-info text-dark">{{ event.event_date }}</span>
+                </div>
+                <p class="mb-1 text-muted">
+                    Категория: {{ event.category.name }} | 
+                    Пользователь: {{ event.user.name }} | 
+                    {% if event.is_recurring %}Ежегодное{% else %}Одноразовое{% endif %}
+                </p>
+            </div>
+        {% empty %}
+            <p>Событий нет.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

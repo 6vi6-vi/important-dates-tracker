@@ -1,0 +1,9 @@
+{% if not reminder.is_active %}
+    <span class="badge bg-secondary reminder-status">Отменено</span>
+{% elif reminder.is_sent %}
+    <span class="badge bg-warning text-dark reminder-status">Показано</span>
+{% elif reminder.is_due(today) %}
+    <span class="badge bg-danger reminder-status">Пора показать</span>
+{% else %}
+    <span class="badge bg-success reminder-status">Активно</span>
+{% endif %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Главная – Important Dates Tracker
+{% endblock %}
+
+{% block content %}
+    <h1 class="display-4">Important Dates Tracker</h1>
+    <p class="lead">
+        Сервис учёта важных дат и напоминаний о них.
+    </p>
+    <p>
+        Главная сущность приложения — напоминание. Оно связывает событие и пользователя
+        и определяет, за сколько дней до события нужно показать уведомление.
+    </p>
+    <p>Основные разделы:</p>
+    <a href="{% url 'reminders:list' %}" class="btn btn-primary me-2">Напоминания</a>
+    <a href="{% url 'events:list' %}" class="btn btn-secondary">События</a>
+{% endblock %}
