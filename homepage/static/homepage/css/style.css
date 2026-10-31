@@ -1,0 +1,12 @@
+.min-vh-100 {
+    min-height: 100vh;
+}
+.tracker-logo {
+    width: 120px;
+    height: auto;
+}
+.reminder-status {
+    font-weight: 600;
+    font-size: 0.85em;
+    padding: 0.35em 0.65em;
+}
