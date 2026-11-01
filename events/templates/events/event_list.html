@@ -6,7 +6,16 @@
 
 {% block content %}
     <h1>События</h1>
-    <p>Всего событий: {{ events|length }}</p>
+
+    <form method="get" class="mb-4 d-flex">
+        <input type="text" name="q" class="form-control me-2" placeholder="Поиск по названию..." value="{{ search_query }}">
+        <button type="submit" class="btn btn-primary">Найти</button>
+        {% if search_query %}
+            <a href="{% url 'events:list' %}" class="btn btn-outline-secondary ms-2">Сбросить</a>
+        {% endif %}
+    </form>
+
+    <p>Всего найдено: {{ events|length }}</p>
 
     <div class="list-group">
         {% for event in events %}
@@ -16,13 +25,13 @@
                     <span class="badge bg-info text-dark">{{ event.event_date }}</span>
                 </div>
                 <p class="mb-1 text-muted">
-                    Категория: {{ event.category.name }} | 
-                    Пользователь: {{ event.user.name }} | 
+                    Категория: {{ event.category_name }} | 
+                    Пользователь: {{ event.user_name }} | 
                     {% if event.is_recurring %}Ежегодное{% else %}Одноразовое{% endif %}
                 </p>
             </div>
         {% empty %}
-            <p>Событий нет.</p>
+            <p>Событий не найдено.</p>
         {% endfor %}
     </div>
 {% endblock %}

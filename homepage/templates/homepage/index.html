@@ -12,4 +12,23 @@
     <p>Основные разделы:</p>
     <a href="{% url 'reminders:list' %}" class="btn btn-primary me-2">Напоминания</a>
     <a href="{% url 'events:list' %}" class="btn btn-secondary">События</a>
+
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Всего событий</h5>
+                    <p class="card-text display-4">{{ total_events }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Всего напоминаний</h5>
+                    <p class="card-text display-4">{{ total_reminders }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

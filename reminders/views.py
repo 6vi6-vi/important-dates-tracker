@@ -1,61 +1,58 @@
-from datetime import date
+import sqlite3
+from datetime import date, datetime
 from django.shortcuts import render
-
-from models.reminders import (
-    find_reminder_by_id,
-    sort_reminders_by_date,
-)
-from storage import (
-    load_categories,
-    load_events,
-    load_reminders,
-    load_users,
-)
-
-
-def _load_all():
-    """Загрузить напоминания и события средствами ПР3."""
-    categories = load_categories("data/categories.json")
-    users = load_users("data/users.json")
-    events = load_events("data/events.json", categories, users)
-    reminders = load_reminders("data/reminders.json", events, users)
-    return reminders, events
+from db.database import DB_PATH
 
 
 def reminders(request):
-    reminders_list, _ = _load_all()
-    reminders_list = sort_reminders_by_date(reminders_list)
-    current_date = date.today()
-    reminders_data = []
-    for reminder in reminders_list:
-        days = reminder.days_left(current_date)
-        is_past = days < 0
-        reminders_data.append({
-            "obj": reminder,
-            "days_left": days,
-            "is_due": reminder.is_due(current_date),
-            "is_past": is_past,
-        })
-    context = {
-        "reminders": reminders_data,
-    }
-    return render(request, "reminders/reminder_list.html", context)
+    """Список напоминаний из БД."""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute("""
+        SELECT
+            r.id, r.remind_before, r.is_active, r.is_sent,
+            e.title AS event_title, e.event_date,
+            u.name AS user_name
+        FROM reminders r
+        JOIN events e ON r.event_id = e.id
+        JOIN users u ON r.user_id = u.id
+        ORDER BY e.event_date
+    """).fetchall()
+    conn.close()
 
-
-def reminder_detail(request, reminder_id):
-    reminders_list, _ = _load_all()
-    reminder = find_reminder_by_id(reminders_list, reminder_id)
     today = date.today()
-    days_left = reminder.days_left(today) if reminder else 0
-    context = {
-        "reminder": reminder,
-        "days_left": days_left,
-        "is_past": days_left < 0 if reminder else False,
-        "is_due": reminder.is_due(today) if reminder else False,
-    }
-    return render(
-        request,
-        "reminders/reminder_detail.html",
-        context,
-        status=404 if reminder is None else 200,
-    )
+    reminders_data = []
+    for row in rows:
+        target_date = datetime.strptime(row["event_date"], "%Y-%m-%d").date()
+        days_left = (target_date - today).days
+        reminders_data.append({
+            "id": row["id"],
+            "event_title": row["event_title"],
+            "user_name": row["user_name"],
+            "remind_before": row["remind_before"],
+            "days_left": days_left,
+            "is_past": days_left < 0,
+            "is_due": 0 <= days_left <= row["remind_before"] and row["is_active"] and not row["is_sent"],
+            "is_active": bool(row["is_active"]),
+            "is_sent": bool(row["is_sent"])
+        })
+
+    return render(request, "reminders/reminder_list.html", {"reminders": reminders_data})
+
+
+def statistics(request):
+    """Статистика по пользователям (SQL GROUP BY)."""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    stats = conn.execute("""
+        SELECT
+            u.name AS user_name,
+            COUNT(r.id) AS reminders_count
+        FROM users u
+        LEFT JOIN reminders r ON u.id = r.user_id
+        GROUP BY u.id, u.name
+        ORDER BY reminders_count DESC
+    """).fetchall()
+    conn.close()
+
+    return render(request, "reminders/statistics.html", {"statistics": stats})

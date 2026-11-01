@@ -1,8 +1,8 @@
-{% if not reminder.obj.is_active %}
+{% if not reminder.is_active %}
     <span class="badge bg-secondary reminder-status">Отменено</span>
 {% elif reminder.is_past %}
     <span class="badge bg-dark reminder-status">Просрочено</span>
-{% elif reminder.obj.is_sent %}
+{% elif reminder.is_sent %}
     <span class="badge bg-warning text-dark reminder-status">Показано</span>
 {% elif reminder.is_due %}
     <span class="badge bg-danger reminder-status">Пора показать</span>
