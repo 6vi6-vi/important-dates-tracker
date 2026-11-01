@@ -35,6 +35,8 @@
                         <span class="badge bg-secondary">Отменено</span>
                     {% elif reminder.is_sent %}
                         <span class="badge bg-warning text-dark">Показано</span>
+                    {% elif is_past %}
+                        <span class="badge bg-dark">Просрочено</span>
                     {% elif is_due %}
                         <span class="badge bg-danger">Пора показать</span>
                     {% else %}
