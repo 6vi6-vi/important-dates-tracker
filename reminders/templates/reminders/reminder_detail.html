@@ -13,9 +13,9 @@
         <div class="card">
             <div class="card-body">
                 <h1 class="card-title">Напоминание №{{ reminder.id }}</h1>
-                <p class="card-text"><strong>Событие:</strong> {{ reminder.event.title }}</p>
-                <p class="card-text"><strong>Дата события:</strong> {{ reminder.event.event_date }}</p>
-                <p class="card-text"><strong>Пользователь:</strong> {{ reminder.user.name }} ({{ reminder.user.email }})</p>
+                <p class="card-text"><strong>Событие:</strong> {{ reminder.event_title }}</p>
+                <p class="card-text"><strong>Дата события:</strong> {{ reminder.event_date }}</p>
+                <p class="card-text"><strong>Пользователь:</strong> {{ reminder.user_name }} ({{ reminder.user_email }})</p>
                 <p class="card-text"><strong>Напомнить за:</strong> {{ reminder.remind_before }} дн.</p>
                 
                 <p class="card-text">

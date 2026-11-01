@@ -25,7 +25,7 @@ def events(request):
         events_list = conn.execute(sql, [f"%{query}%"]).fetchall()
     else:
         sql += " ORDER BY e.event_date"
-        events_list = conn.execute(sql).fetchall()    
+        events_list = conn.execute(sql).fetchall()
     conn.close()
 
     context = {

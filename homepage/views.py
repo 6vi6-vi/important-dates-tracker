@@ -16,3 +16,8 @@ def index(request):
         "total_reminders": total_reminders,
     }
     return render(request, "homepage/index.html", context)
+
+
+def page_not_found(request, exception):
+    """Собственная страница 404."""
+    return render(request, "404.html", status=404)
