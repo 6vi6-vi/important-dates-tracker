@@ -17,10 +17,29 @@
                 <p class="card-text"><strong>Дата события:</strong> {{ reminder.event.event_date }}</p>
                 <p class="card-text"><strong>Пользователь:</strong> {{ reminder.user.name }} ({{ reminder.user.email }})</p>
                 <p class="card-text"><strong>Напомнить за:</strong> {{ reminder.remind_before }} дн.</p>
-                <p class="card-text"><strong>Осталось дней:</strong> {{ reminder.days_left(today) }}</p>
+                
+                <p class="card-text">
+                    <strong>Осталось дней:</strong> 
+                    {% if is_past %}
+                        <span class="text-danger">событие уже прошло</span>
+                    {% elif days_left == 0 %}
+                        <span class="text-warning">сегодня</span>
+                    {% else %}
+                        {{ days_left }}
+                    {% endif %}
+                </p>
+
                 <p class="card-text">
                     <strong>Состояние:</strong>
-                    {% include "reminders/includes/reminder_status.html" %}
+                    {% if not reminder.is_active %}
+                        <span class="badge bg-secondary">Отменено</span>
+                    {% elif reminder.is_sent %}
+                        <span class="badge bg-warning text-dark">Показано</span>
+                    {% elif is_due %}
+                        <span class="badge bg-danger">Пора показать</span>
+                    {% else %}
+                        <span class="badge bg-success">Активно</span>
+                    {% endif %}
                 </p>
             </div>
         </div>

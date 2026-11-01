@@ -1,11 +1,17 @@
-<a href="{% url 'reminders:detail' reminder.id %}" class="list-group-item list-group-item-action">
+<a href="{% url 'reminders:detail' reminder.obj.id %}" class="list-group-item list-group-item-action">
     <div class="d-flex w-100 justify-content-between">
-        <h5 class="mb-1">{{ reminder.event.title|default:"Без названия" }}</h5>
-        <small>для {{ reminder.user.name }}</small>
+        <h5 class="mb-1">{{ reminder.obj.event.title|default:"Без названия" }}</h5>
+        <small>для {{ reminder.obj.user.name }}</small>
     </div>
     <p class="mb-1">
-        За {{ reminder.remind_before }} дн. 
-        (осталось {{ reminder.days_left(today) }} дн.)
+        Напомнить за {{ reminder.obj.remind_before }} дн.
+        {% if reminder.is_past %}
+            (событие уже прошло)
+        {% elif reminder.days_left == 0 %}
+            (сегодня!)
+        {% else %}
+            (осталось {{ reminder.days_left }} дн.)
+        {% endif %}
     </p>
     {% include "reminders/includes/reminder_status.html" %}
 </a>

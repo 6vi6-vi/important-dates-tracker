@@ -88,6 +88,13 @@ def find_event_by_id(
     return None
 
 
+def filter_events_by_category(
+    events: List[Event], category: Category
+) -> List[Event]:
+    """Отобрать события по категории."""
+    return [e for e in events if e.category.id == category.id]
+
+
 def sort_events_by_date(events: List[Event]) -> List[Event]:
     """Отсортировать события по дате."""
     return sorted(events, key=lambda e: e.event_date)
@@ -100,3 +107,12 @@ def show_events(events: List[Event]) -> None:
         return
     for event in events:
         print(event)
+
+
+def delete_event(events: list[Event], event_id: int) -> bool:
+    """Удалить событие по идентификатору."""
+    for event in events:
+        if event.id == event_id:
+            events.remove(event)
+            return True
+    return False
