@@ -8,6 +8,25 @@
     <h1>Напоминания</h1>
     <p>Всего напоминаний: {{ reminders|length }}</p>
 
+    <div class="mb-4">
+        <a href="{% url 'reminders:list' %}?filter=all" 
+        class="btn btn-sm {% if filter_type == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            Все
+        </a>
+        <a href="{% url 'reminders:list' %}?filter=active" 
+        class="btn btn-sm {% if filter_type == 'active' %}btn-success{% else %}btn-outline-success{% endif %}">
+            Активные (предстоящие)
+        </a>
+        <a href="{% url 'reminders:list' %}?filter=past" 
+        class="btn btn-sm {% if filter_type == 'past' %}btn-dark{% else %}btn-outline-dark{% endif %}">
+            Просроченные
+        </a>
+        <a href="{% url 'reminders:list' %}?filter=inactive" 
+        class="btn btn-sm {% if filter_type == 'inactive' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+            Отменённые
+        </a>
+    </div>
+
     <div class="list-group">
         {% for reminder in reminders %}
             {% include "reminders/includes/reminder_card.html" %}

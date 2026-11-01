@@ -9,7 +9,7 @@ exclude =
     dist,
     .idea,
     migrations
-max-line-length = 120
+max-line-length = 140
 per-file-ignores =
     */__init__.py: F401
     */admin.py: F401

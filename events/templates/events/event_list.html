@@ -34,4 +34,14 @@
             <p>Событий не найдено.</p>
         {% endfor %}
     </div>
+
+    <hr class="my-5">
+    <h3>События без напоминаний</h3>
+    <ul class="list-group">
+        {% for event in lonely_events %}
+            <li class="list-group-item text-danger">{{ event.title }}</li>
+        {% empty %}
+            <li class="list-group-item text-success">У всех событий есть напоминания!</li>
+        {% endfor %}
+    </ul>
 {% endblock %}
