@@ -105,5 +105,5 @@ def statistics(request):
 
     return render(request, "reminders/statistics.html", {
         "statistics": stats,
-        "active_count": active_count
+        "active_count": active_count 
     })
