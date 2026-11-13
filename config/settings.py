@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "homepage",
     "reminders",
     "events",
+    "users",
 ]
 
 MIDDLEWARE = [
