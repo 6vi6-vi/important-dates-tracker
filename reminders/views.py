@@ -19,6 +19,12 @@ def reminders(request):
     if filter_type not in ["past"]:
         queryset = queryset.order_by("event__event_date")
 
+    for reminder in queryset:
+        days_left = (reminder.event.event_date - today).days
+        reminder.is_past = days_left < 0
+        reminder.days_left = days_left
+        reminder.is_due = 0 <= days_left <= reminder.remind_before and reminder.is_active and not reminder.is_sent
+
     return render(request, "reminders/reminder_list.html", {
         "reminders": queryset,
         "filter_type": filter_type

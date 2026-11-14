@@ -25,8 +25,8 @@
                     <span class="badge bg-info text-dark">{{ event.event_date }}</span>
                 </div>
                 <p class="mb-1 text-muted">
-                    Категория: {{ event.category_name }} | 
-                    Пользователь: {{ event.user_name }} | 
+                    Категория: {{ event.category.name }} | 
+                    Пользователь: {{ event.user.name }} | 
                     {% if event.is_recurring %}Ежегодное{% else %}Одноразовое{% endif %}
                 </p>
             </div>

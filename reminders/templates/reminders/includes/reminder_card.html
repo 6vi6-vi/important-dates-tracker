@@ -1,7 +1,7 @@
 <a href="{% url 'reminders:detail' reminder.id %}" class="list-group-item list-group-item-action">
     <div class="d-flex w-100 justify-content-between">
-        <h5 class="mb-1">{{ reminder.event_title|default:"Без названия" }}</h5>
-        <small>для {{ reminder.user_name }}</small>
+        <h5 class="mb-1">{{ reminder.event.title|default:"Без названия" }}</h5>
+        <small>для {{ reminder.user.name }}</small>
     </div>
     <p class="mb-1">
         Напомнить за {{ reminder.remind_before }} дн. 
