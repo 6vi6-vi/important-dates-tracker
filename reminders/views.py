@@ -2,7 +2,6 @@ from datetime import date
 from django.core.paginator import Paginator
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, render
-from events.models import Event
 from reminders.models import Reminder
 from users.models import User
 
@@ -58,7 +57,7 @@ def reminder_detail(request, reminder_id):
 def statistics(request):
     stats = User.objects.annotate(
         reminders_count=Count('reminders')
-    ).order_by("-reminders_count")  
+    ).order_by("-reminders_count")
     active_count = Reminder.objects.filter(is_active=True).count()
 
     return render(request, "reminders/statistics.html", {
