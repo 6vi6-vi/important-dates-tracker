@@ -32,11 +32,12 @@
         </div>
     </div>
 
-    <!-- В самом низу, после карточек статистики -->
     <h3 class="mt-5">Пользователи системы</h3>
     <ul class="list-group">
         {% for user in users %}
             <li class="list-group-item">{{ user.name }} ({{ user.email }})</li>
+        {% empty %}
+            <li class="list-group-item text-muted">Пользователей пока нет.</li>
         {% endfor %}
     </ul>
 {% endblock %}

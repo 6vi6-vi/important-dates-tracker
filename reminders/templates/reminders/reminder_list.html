@@ -6,26 +6,24 @@
 
 {% block content %}
     <h1>Напоминания</h1>
-    <p>Всего напоминаний: {{ reminders|length }}</p>
 
-    <div class="mb-4">
-        <a href="{% url 'reminders:list' %}?filter=all" 
-        class="btn btn-sm {% if filter_type == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-            Все
-        </a>
-        <a href="{% url 'reminders:list' %}?filter=active" 
-        class="btn btn-sm {% if filter_type == 'active' %}btn-success{% else %}btn-outline-success{% endif %}">
-            Активные (предстоящие)
-        </a>
-        <a href="{% url 'reminders:list' %}?filter=past" 
-        class="btn btn-sm {% if filter_type == 'past' %}btn-dark{% else %}btn-outline-dark{% endif %}">
-            Просроченные
-        </a>
-        <a href="{% url 'reminders:list' %}?filter=inactive" 
-        class="btn btn-sm {% if filter_type == 'inactive' %}btn-danger{% else %}btn-outline-danger{% endif %}">
-            Отменённые
-        </a>
+    <div class="mb-3">
+        <a href="?filter=all&sort={{ sort }}" class="btn btn-sm {% if filter_type == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">Все</a>
+        <a href="?filter=active&sort={{ sort }}" class="btn btn-sm {% if filter_type == 'active' %}btn-success{% else %}btn-outline-success{% endif %}">Активные</a>
+        <a href="?filter=past&sort={{ sort }}" class="btn btn-sm {% if filter_type == 'past' %}btn-dark{% else %}btn-outline-dark{% endif %}">Просроченные</a>
+        <a href="?filter=inactive&sort={{ sort }}" class="btn btn-sm {% if filter_type == 'inactive' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">Отменённые</a>
     </div>
+
+    <div class="mb-4 d-flex align-items-center">
+        <span class="me-2 text-muted">Сортировать по:</span>
+        <div class="btn-group btn-group-sm">
+            <a href="?filter={{ filter_type }}&sort=date" class="btn {% if sort == 'date' %}btn-primary{% else %}btn-outline-primary{% endif %}">Дате (сначала ближайшие)</a>
+            <a href="?filter={{ filter_type }}&sort=date_desc" class="btn {% if sort == 'date_desc' %}btn-primary{% else %}btn-outline-primary{% endif %}">Дате (сначала дальние)</a>
+            <a href="?filter={{ filter_type }}&sort=title" class="btn {% if sort == 'title' %}btn-primary{% else %}btn-outline-primary{% endif %}">Названию</a>
+        </div>
+    </div>
+
+    <p>Всего найдено: {{ page_obj.paginator.count }}</p>
 
     <div class="list-group">
         {% for reminder in reminders %}
@@ -34,4 +32,36 @@
             <p>Напоминаний нет.</p>
         {% endfor %}
     </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="Навигация по страницам" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?filter={{ filter_type }}&sort={{ sort }}&page={{ page_obj.previous_page_number }}">Назад</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Назад</span></li>
+            {% endif %}
+
+            {% for page_number in page_obj.paginator.page_range %}
+                {% if page_number == page_obj.number %}
+                    <li class="page-item active"><span class="page-link">{{ page_number }}</span></li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?filter={{ filter_type }}&sort={{ sort }}&page={{ page_number }}">{{ page_number }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?filter={{ filter_type }}&sort={{ sort }}&page={{ page_obj.next_page_number }}">Далее</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Далее</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 {% endblock %}

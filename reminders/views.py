@@ -1,5 +1,6 @@
 from datetime import date
-from django.db.models import Count, Q
+from django.core.paginator import Paginator
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, render
 from events.models import Event
 from reminders.models import Reminder
@@ -8,15 +9,20 @@ from users.models import User
 
 def reminders(request):
     filter_type = request.GET.get("filter", "all")
+    sort = request.GET.get("sort", "date")
     queryset = Reminder.objects.select_related("event", "user")
     today = date.today()
     if filter_type == "active":
         queryset = queryset.filter(is_active=True, event__event_date__gte=today)
     elif filter_type == "past":
-        queryset = queryset.filter(event__event_date__lt=today).order_by("-event__event_date")
+        queryset = queryset.filter(event__event_date__lt=today)
     elif filter_type == "inactive":
-        queryset = queryset.filter(is_active=False)      
-    if filter_type not in ["past"]:
+        queryset = queryset.filter(is_active=False)
+    if sort == "title":
+        queryset = queryset.order_by("event__title")
+    elif sort == "date_desc":
+        queryset = queryset.order_by("-event__event_date")
+    else:
         queryset = queryset.order_by("event__event_date")
 
     for reminder in queryset:
@@ -25,9 +31,15 @@ def reminders(request):
         reminder.days_left = days_left
         reminder.is_due = 0 <= days_left <= reminder.remind_before and reminder.is_active and not reminder.is_sent
 
+    paginator = Paginator(queryset, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     return render(request, "reminders/reminder_list.html", {
-        "reminders": queryset,
-        "filter_type": filter_type
+        "reminders": page_obj,
+        "page_obj": page_obj,
+        "filter_type": filter_type,
+        "sort": sort,
     })
 
 
