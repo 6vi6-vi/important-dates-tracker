@@ -1,107 +1,47 @@
-import sqlite3
-from datetime import date, datetime
-from django.shortcuts import render
-from db.database import DB_PATH
+from datetime import date
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, render
+from events.models import Event
+from reminders.models import Reminder
+from users.models import User
 
 
 def reminders(request):
     filter_type = request.GET.get("filter", "all")
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-
-    sql = """
-        SELECT r.id, r.remind_before, r.is_active, r.is_sent,
-               e.title AS event_title, e.event_date, u.name AS user_name
-        FROM reminders r
-        JOIN events e ON r.event_id = e.id
-        JOIN users u ON r.user_id = u.id
-    """
-
-    today_str = date.today().isoformat()
-    if filter_type == "active":
-        # Только активные и ещё не прошедшие события
-        sql += " WHERE r.is_active = 1 AND e.event_date >= ?"
-        rows = conn.execute(sql + " ORDER BY e.event_date", [today_str]).fetchall()
-    elif filter_type == "past":
-        # Только прошедшие события
-        sql += " WHERE e.event_date < ?"
-        rows = conn.execute(sql + " ORDER BY e.event_date DESC", [today_str]).fetchall()
-    elif filter_type == "inactive":
-        # Только отменённые
-        sql += " WHERE r.is_active = 0"
-        rows = conn.execute(sql + " ORDER BY e.event_date").fetchall()
-    else:
-        # Все напоминания (Запрос 1)
-        rows = conn.execute(sql + " ORDER BY e.event_date").fetchall()
-    conn.close()
-
+    queryset = Reminder.objects.select_related("event", "user")
     today = date.today()
-    reminders_data = []
-    for row in rows:
-        target_date = datetime.strptime(row["event_date"], "%Y-%m-%d").date()
-        days_left = (target_date - today).days
-        reminders_data.append({
-            "id": row["id"], "event_title": row["event_title"], "event_date": row["event_date"],
-            "user_name": row["user_name"], "remind_before": row["remind_before"],
-            "days_left": days_left, "is_past": days_left < 0,
-            "is_due": 0 <= days_left <= row["remind_before"] and row["is_active"] and not row["is_sent"],
-            "is_active": bool(row["is_active"]), "is_sent": bool(row["is_sent"])
-        })
+    if filter_type == "active":
+        queryset = queryset.filter(is_active=True, event__event_date__gte=today)
+    elif filter_type == "past":
+        queryset = queryset.filter(event__event_date__lt=today).order_by("-event__event_date")
+    elif filter_type == "inactive":
+        queryset = queryset.filter(is_active=False)      
+    if filter_type not in ["past"]:
+        queryset = queryset.order_by("event__event_date")
 
     return render(request, "reminders/reminder_list.html", {
-        "reminders": reminders_data,
+        "reminders": queryset,
         "filter_type": filter_type
     })
 
 
 def reminder_detail(request, reminder_id):
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    # Запрос 10 (WHERE по ID) + Запрос 4 (JOIN)
-    query = """
-        SELECT r.id, r.remind_before, r.is_active, r.is_sent,
-               e.title AS event_title, e.event_date, u.name AS user_name, u.email AS user_email
-        FROM reminders r
-        JOIN events e ON r.event_id = e.id
-        JOIN users u ON r.user_id = u.id
-        WHERE r.id = ?
-    """
-    row = conn.execute(query, [reminder_id]).fetchone()
-    conn.close()
-
-    if not row:
-        return render(request, "reminders/reminder_detail.html", {"reminder": None}, status=404)
-
+    reminder = get_object_or_404(Reminder.objects.select_related("event", "user"), pk=reminder_id)
     today = date.today()
-    target_date = datetime.strptime(row["event_date"], "%Y-%m-%d").date()
-    days_left = (target_date - today).days
-    reminder_data = {
-        "id": row["id"], "event_title": row["event_title"], "event_date": row["event_date"],
-        "user_name": row["user_name"], "user_email": row["user_email"], "remind_before": row["remind_before"],
-        "is_active": bool(row["is_active"]), "is_sent": bool(row["is_sent"])
-    }
-
+    days_left = (reminder.event.event_date - today).days
     return render(request, "reminders/reminder_detail.html", {
-        "reminder": reminder_data, "days_left": days_left,
-        "is_past": days_left < 0, "is_due": 0 <= days_left <= row["remind_before"] and row["is_active"] and not row["is_sent"]
-    }, status=200)
+        "reminder": reminder,
+        "days_left": days_left,
+        "is_past": days_left < 0,
+        "is_due": 0 <= days_left <= reminder.remind_before and reminder.is_active and not reminder.is_sent,
+    })
 
 
 def statistics(request):
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    # Запрос 6: Статистика по пользователям (GROUP BY)
-    stats = conn.execute("""
-        SELECT u.name AS user_name, COUNT(r.id) AS reminders_count
-        FROM users u
-        LEFT JOIN reminders r ON u.id = r.user_id
-        GROUP BY u.id, u.name
-        ORDER BY reminders_count DESC
-    """).fetchall()
-
-    # Запрос 5: Общее количество активных напоминаний (COUNT + WHERE)
-    active_count = conn.execute("SELECT COUNT(*) AS active_reminders FROM reminders WHERE is_active = 1").fetchone()["active_reminders"]
-    conn.close()
+    stats = User.objects.annotate(
+        reminders_count=Count('reminders')
+    ).order_by("-reminders_count")  
+    active_count = Reminder.objects.filter(is_active=True).count()
 
     return render(request, "reminders/statistics.html", {
         "statistics": stats,
