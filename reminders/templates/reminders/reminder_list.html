@@ -7,19 +7,30 @@
 {% block content %}
     <h1>Напоминания</h1>
 
+    <form method="get" class="mb-4 d-flex">
+        <input type="text" name="q" class="form-control me-2" placeholder="Поиск по событию или пользователю..." value="{{ search_query }}">
+        <input type="hidden" name="filter" value="{{ filter_type }}">
+        <input type="hidden" name="sort" value="{{ sort }}">
+        
+        <button type="submit" class="btn btn-primary">Найти</button>
+        {% if search_query %}
+            <a href="?filter={{ filter_type }}&sort={{ sort }}" class="btn btn-outline-secondary ms-2">Сбросить</a>
+        {% endif %}
+    </form>
+
     <div class="mb-3">
-        <a href="?filter=all&sort={{ sort }}" class="btn btn-sm {% if filter_type == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">Все</a>
-        <a href="?filter=active&sort={{ sort }}" class="btn btn-sm {% if filter_type == 'active' %}btn-success{% else %}btn-outline-success{% endif %}">Активные</a>
-        <a href="?filter=past&sort={{ sort }}" class="btn btn-sm {% if filter_type == 'past' %}btn-dark{% else %}btn-outline-dark{% endif %}">Просроченные</a>
-        <a href="?filter=inactive&sort={{ sort }}" class="btn btn-sm {% if filter_type == 'inactive' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">Отменённые</a>
+        <a href="?filter=all&sort={{ sort }}&q={{ search_query }}" class="btn btn-sm {% if filter_type == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">Все</a>
+        <a href="?filter=active&sort={{ sort }}&q={{ search_query }}" class="btn btn-sm {% if filter_type == 'active' %}btn-success{% else %}btn-outline-success{% endif %}">Активные</a>
+        <a href="?filter=past&sort={{ sort }}&q={{ search_query }}" class="btn btn-sm {% if filter_type == 'past' %}btn-dark{% else %}btn-outline-dark{% endif %}">Просроченные</a>
+        <a href="?filter=inactive&sort={{ sort }}&q={{ search_query }}" class="btn btn-sm {% if filter_type == 'inactive' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">Отменённые</a>
     </div>
 
     <div class="mb-4 d-flex align-items-center">
         <span class="me-2 text-muted">Сортировать по:</span>
         <div class="btn-group btn-group-sm">
-            <a href="?filter={{ filter_type }}&sort=date" class="btn {% if sort == 'date' %}btn-primary{% else %}btn-outline-primary{% endif %}">Дате (сначала ближайшие)</a>
-            <a href="?filter={{ filter_type }}&sort=date_desc" class="btn {% if sort == 'date_desc' %}btn-primary{% else %}btn-outline-primary{% endif %}">Дате (сначала дальние)</a>
-            <a href="?filter={{ filter_type }}&sort=title" class="btn {% if sort == 'title' %}btn-primary{% else %}btn-outline-primary{% endif %}">Названию</a>
+            <a href="?filter={{ filter_type }}&sort=date&q={{ search_query }}" class="btn {% if sort == 'date' %}btn-primary{% else %}btn-outline-primary{% endif %}">Дате (сначала ближайшие)</a>
+            <a href="?filter={{ filter_type }}&sort=date_desc&q={{ search_query }}" class="btn {% if sort == 'date_desc' %}btn-primary{% else %}btn-outline-primary{% endif %}">Дате (сначала дальние)</a>
+            <a href="?filter={{ filter_type }}&sort=title&q={{ search_query }}" class="btn {% if sort == 'title' %}btn-primary{% else %}btn-outline-primary{% endif %}">Названию</a>
         </div>
     </div>
 
@@ -29,7 +40,7 @@
         {% for reminder in reminders %}
             {% include "reminders/includes/reminder_card.html" %}
         {% empty %}
-            <p>Напоминаний нет.</p>
+            <p>Напоминаний не найдено.</p>
         {% endfor %}
     </div>
 
@@ -38,7 +49,7 @@
         <ul class="pagination justify-content-center">
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?filter={{ filter_type }}&sort={{ sort }}&page={{ page_obj.previous_page_number }}">Назад</a>
+                    <a class="page-link" href="?filter={{ filter_type }}&sort={{ sort }}&q={{ search_query }}&page={{ page_obj.previous_page_number }}">Назад</a>
                 </li>
             {% else %}
                 <li class="page-item disabled"><span class="page-link">Назад</span></li>
@@ -49,14 +60,14 @@
                     <li class="page-item active"><span class="page-link">{{ page_number }}</span></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="?filter={{ filter_type }}&sort={{ sort }}&page={{ page_number }}">{{ page_number }}</a>
+                        <a class="page-link" href="?filter={{ filter_type }}&sort={{ sort }}&q={{ search_query }}&page={{ page_number }}">{{ page_number }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?filter={{ filter_type }}&sort={{ sort }}&page={{ page_obj.next_page_number }}">Далее</a>
+                    <a class="page-link" href="?filter={{ filter_type }}&sort={{ sort }}&q={{ search_query }}&page={{ page_obj.next_page_number }}">Далее</a>
                 </li>
             {% else %}
                 <li class="page-item disabled"><span class="page-link">Далее</span></li>

@@ -1,5 +1,6 @@
 from datetime import date
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, render
 from reminders.models import Reminder
@@ -9,14 +10,22 @@ from users.models import User
 def reminders(request):
     filter_type = request.GET.get("filter", "all")
     sort = request.GET.get("sort", "date")
+    query = request.GET.get("q", "").strip()
     queryset = Reminder.objects.select_related("event", "user")
     today = date.today()
+
     if filter_type == "active":
         queryset = queryset.filter(is_active=True, event__event_date__gte=today)
     elif filter_type == "past":
         queryset = queryset.filter(event__event_date__lt=today)
     elif filter_type == "inactive":
         queryset = queryset.filter(is_active=False)
+
+    if query:
+        queryset = queryset.filter(
+            Q(event__title__icontains=query) | Q(user__name__icontains=query)
+        )
+
     if sort == "title":
         queryset = queryset.order_by("event__title")
     elif sort == "date_desc":
@@ -39,6 +48,7 @@ def reminders(request):
         "page_obj": page_obj,
         "filter_type": filter_type,
         "sort": sort,
+        "search_query": query,
     })
 
 
