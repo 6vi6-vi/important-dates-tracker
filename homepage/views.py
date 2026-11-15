@@ -9,7 +9,9 @@ def index(request):
     total_events = Event.objects.count()
     total_reminders = Reminder.objects.count()
     users = User.objects.all()
-    categories_stats = Category.objects.annotate(events_count=Count('events'))
+    categories_stats = Category.objects.annotate(
+        events_count=Count('events')
+    )
 
     return render(request, "homepage/index.html", {
         "total_events": total_events,
