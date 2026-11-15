@@ -4,6 +4,7 @@ from users.models import User
 from django.utils.text import slugify
 from unidecode import unidecode
 from django.urls import reverse
+from datetime import date
 
 
 class Reminder(models.Model):
@@ -26,8 +27,22 @@ class Reminder(models.Model):
     )
 
     @property
-    def is_active(self):
-        return self.status == self.Status.ACTIVE
+    def current_status(self):
+        """Возвращает актуальный статус с учетом даты события."""
+        if self.status == self.Status.CANCELLED:
+            return self.Status.CANCELLED
+        if self.event.event_date < date.today():
+            return self.Status.COMPLETED
+        return self.Status.ACTIVE
+
+    @property
+    def status_display(self):
+        """Возвращает русское название актуального статуса."""
+        if self.current_status == self.Status.CANCELLED:
+            return "Отменено"
+        if self.current_status == self.Status.COMPLETED:
+            return "Завершено (срок истек)"
+        return "Активно"
 
     def save(self, *args, **kwargs):
         if not self.slug:

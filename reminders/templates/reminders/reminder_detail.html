@@ -31,14 +31,10 @@
 
                 <p class="card-text">
                     <strong>Состояние:</strong>
-                    {% if not reminder.is_active %}
+                    {% if reminder.current_status == 'cancelled' %}
                         <span class="badge bg-secondary">Отменено</span>
-                    {% elif reminder.is_sent %}
-                        <span class="badge bg-warning text-dark">Показано</span>
-                    {% elif is_past %}
-                        <span class="badge bg-dark">Просрочено</span>
-                    {% elif is_due %}
-                        <span class="badge bg-danger">Пора показать</span>
+                    {% elif reminder.current_status == 'completed' %}
+                        <span class="badge bg-dark">Завершено</span>
                     {% else %}
                         <span class="badge bg-success">Активно</span>
                     {% endif %}

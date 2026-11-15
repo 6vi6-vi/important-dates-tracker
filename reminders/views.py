@@ -14,12 +14,9 @@ def reminders(request):
     today = date.today()
 
     if filter_type == "active":
-        queryset = queryset.filter(
-            status=Reminder.Status.ACTIVE,
-            event__event_date__gte=today
-        )
+        queryset = queryset.filter(status=Reminder.Status.ACTIVE, event__event_date__gte=today)      
     elif filter_type == "past":
-        queryset = queryset.filter(event__event_date__lt=today)
+        queryset = queryset.filter(event__event_date__lt=today).exclude(status=Reminder.Status.CANCELLED)       
     elif filter_type == "inactive":
         queryset = queryset.filter(status=Reminder.Status.CANCELLED)
 
@@ -41,7 +38,7 @@ def reminders(request):
         reminder.days_left = days_left
         reminder.is_due = (
             0 <= days_left <= reminder.remind_before
-            and reminder.status == Reminder.Status.ACTIVE
+            and reminder.current_status == Reminder.Status.ACTIVE
             and not reminder.is_sent
         )
 
@@ -71,7 +68,7 @@ def reminder_detail(request, slug):
         "is_past": days_left < 0,
         "is_due": (
             0 <= days_left <= reminder.remind_before
-            and reminder.status == Reminder.Status.ACTIVE
+            and reminder.current_status == Reminder.Status.ACTIVE
             and not reminder.is_sent
         ),
     })
@@ -81,9 +78,23 @@ def statistics(request):
     stats = User.objects.annotate(
         reminders_count=Count('reminders')
     ).order_by("-reminders_count")
-    active_count = Reminder.objects.filter(status=Reminder.Status.ACTIVE).count()
+    today = date.today()
+    active_count = Reminder.objects.filter(
+        status=Reminder.Status.ACTIVE, 
+        event__event_date__gte=today
+    ).count()
+
+    completed_count = Reminder.objects.filter(
+        event__event_date__lt=today
+    ).exclude(status=Reminder.Status.CANCELLED).count()
+
+    cancelled_count = Reminder.objects.filter(
+        status=Reminder.Status.CANCELLED
+    ).count()
 
     return render(request, "reminders/statistics.html", {
         "statistics": stats,
-        "active_count": active_count
+        "active_count": active_count,
+        "completed_count": completed_count,
+        "cancelled_count": cancelled_count,
     })
