@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ event.title }} – Important Dates
+{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">{{ event.title }}</h1>
+            <p class="card-text"><strong>Дата:</strong> {{ event.event_date }}</p>
+            <p class="card-text"><strong>Категория:</strong> {{ event.category.name }}</p>
+            <p class="card-text"><strong>Пользователь:</strong> {{ event.user.name }}</p>
+            <p class="card-text"><strong>Тип:</strong> {% if event.is_recurring %}Ежегодное{% else %}Одноразовое{% endif %}</p>
+        </div>
+    </div>
+    <a href="{% url 'events:list' %}" class="btn btn-outline-secondary mt-3">← к списку событий</a>
+{% endblock %}

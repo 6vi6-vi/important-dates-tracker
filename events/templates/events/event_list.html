@@ -35,7 +35,9 @@
         {% for event in events %}
             <div class="list-group-item">
                 <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">{{ event.title|default:"Без названия" }}</h5>
+                    <h5 class="mb-1">
+                        <a href="{{ event.get_absolute_url }}">{{ event.title|default:"Без названия" }}</a>
+                    </h5>
                     <span class="badge bg-info text-dark">{{ event.event_date }}</span>
                 </div>
                 <p class="mb-1 text-muted">

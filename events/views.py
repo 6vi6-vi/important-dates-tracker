@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.db.models import Q
 from events.models import Event
 from datetime import date
@@ -21,3 +21,9 @@ def events(request):
         "lonely_events": lonely_events,
         "show_past": show_past,
     })
+
+
+def event_detail(request, slug):
+    """Детальная страница события."""
+    event = get_object_or_404(Event.objects.select_related("category", "user"), slug=slug)
+    return render(request, "events/event_detail.html", {"event": event})
