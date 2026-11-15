@@ -4,6 +4,7 @@ from users.models import User
 from django.utils.text import slugify
 from unidecode import unidecode
 from django.urls import reverse
+from django.db.models import Func, F, Value
 
 
 class Category(models.Model):
@@ -31,6 +32,29 @@ class Event(models.Model):
         verbose_name="Длина названия"
     )
     slug = models.SlugField(max_length=180, unique=True, editable=False, verbose_name="URL-идентификатор")
+    weekday_number = models.GeneratedField(
+        expression=Func(
+            Value("%w"),
+            F('event_date'),
+            function='STRFTIME'
+        ),
+        output_field=models.IntegerField(),
+        db_persist=True,
+        verbose_name="День недели (код)"
+    )
+
+    @property
+    def weekday_name(self):
+        days = {
+            0: "Воскресенье",
+            1: "Понедельник",
+            2: "Вторник",
+            3: "Среда",
+            4: "Четверг",
+            5: "Пятница",
+            6: "Суббота",
+        }
+        return days.get(self.weekday_number, "")
 
     def save(self, *args, **kwargs):
         if not self.slug:

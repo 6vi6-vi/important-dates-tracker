@@ -38,7 +38,7 @@
                     <h5 class="mb-1">
                         <a href="{{ event.get_absolute_url }}">{{ event.title|default:"Без названия" }}</a>
                     </h5>
-                    <span class="badge bg-info text-dark">{{ event.event_date }}</span>
+                    <span class="badge bg-info text-dark">{{ event.event_date }} ({{ event.weekday_name }})</span>
                 </div>
                 <p class="mb-1 text-muted">
                     Категория: {{ event.category.name }} | 

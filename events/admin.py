@@ -12,7 +12,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "event_date", "category", "user", "is_recurring", "site_link")
+    list_display = ("id", "title", "event_date", "weekday_name", "category", "user", "is_recurring", "site_link")
     list_display_links = ("title",)
     search_fields = ("title", "category__name", "user__name")
     list_filter = ("event_date", "is_recurring", "category")
@@ -20,7 +20,17 @@ class EventAdmin(admin.ModelAdmin):
     list_per_page = 20
     view_on_site = True
     inlines = [ReminderInline]
+    actions = ["make_recurring"]
 
     @admin.display(description="На сайте")
     def site_link(self, obj):
         return format_html('<a href="{}" target="_blank">Открыть</a>', obj.get_absolute_url())
+
+    @admin.display(description="День недели")
+    def weekday_name(self, obj):
+        return obj.weekday_name
+
+    @admin.action(description="Сделать события ежегодными")
+    def make_recurring(self, request, queryset):
+        updated = queryset.update(is_recurring=True)
+        self.message_user(request, f"Сделано ежегодными: {updated} шт.")
