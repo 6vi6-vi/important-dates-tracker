@@ -58,8 +58,11 @@ def reminders(request):
     })
 
 
-def reminder_detail(request, reminder_id):
-    reminder = get_object_or_404(Reminder.objects.select_related("event", "user"), pk=reminder_id)
+def reminder_detail(request, slug):
+    reminder = get_object_or_404(
+        Reminder.objects.select_related("event", "user"), 
+        slug=slug
+    )
     today = date.today()
     days_left = (reminder.event.event_date - today).days
     return render(request, "reminders/reminder_detail.html", {
@@ -67,8 +70,8 @@ def reminder_detail(request, reminder_id):
         "days_left": days_left,
         "is_past": days_left < 0,
         "is_due": (
-            0 <= days_left <= reminder.remind_before
-            and reminder.status == Reminder.Status.ACTIVE
+            0 <= days_left <= reminder.remind_before 
+            and reminder.status == Reminder.Status.ACTIVE 
             and not reminder.is_sent
         ),
     })
