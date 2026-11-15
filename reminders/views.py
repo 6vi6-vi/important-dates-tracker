@@ -14,9 +14,9 @@ def reminders(request):
     today = date.today()
 
     if filter_type == "active":
-        queryset = queryset.filter(status=Reminder.Status.ACTIVE, event__event_date__gte=today)      
+        queryset = queryset.filter(status=Reminder.Status.ACTIVE, event__event_date__gte=today)
     elif filter_type == "past":
-        queryset = queryset.filter(event__event_date__lt=today).exclude(status=Reminder.Status.CANCELLED)       
+        queryset = queryset.filter(event__event_date__lt=today).exclude(status=Reminder.Status.CANCELLED)
     elif filter_type == "inactive":
         queryset = queryset.filter(status=Reminder.Status.CANCELLED)
 
@@ -80,7 +80,7 @@ def statistics(request):
     ).order_by("-reminders_count")
     today = date.today()
     active_count = Reminder.objects.filter(
-        status=Reminder.Status.ACTIVE, 
+        status=Reminder.Status.ACTIVE,
         event__event_date__gte=today
     ).count()
 

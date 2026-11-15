@@ -14,7 +14,6 @@ class Reminder:
         self,
         reminder_id: int,
         event: Event,
-        user: User,
         remind_before: int,
         is_sent: bool = False,
         is_active: bool = True,
@@ -22,7 +21,7 @@ class Reminder:
         """Создать объект напоминания."""
         self.id = reminder_id
         self.event = event
-        self.user = user
+        self.user = event.user  # Берем пользователя из события
         self.remind_before = remind_before
         self.is_sent = is_sent
         self.is_active = is_active
@@ -62,15 +61,11 @@ class Reminder:
         event = next(
             (e for e in events if e.id == data["event_id"]), None
         )
-        user = next(
-            (u for u in users if u.id == data["user_id"]), None
-        )
-        if event is None or user is None:
+        if event is None:
             return None
         return cls(
             reminder_id=data["id"],
             event=event,
-            user=user,
             remind_before=data["remind_before"],
             is_sent=data.get("is_sent", False),
             is_active=data.get("is_active", True),
@@ -89,14 +84,13 @@ class Reminder:
 def add_reminder(
     reminders: List[Reminder],
     event: Event,
-    user: User,
     remind_before: int,
 ) -> Optional[Reminder]:
     """Создать объект Reminder и добавить его в коллекцию."""
     if not Reminder.validate_remind_before(remind_before):
         return None
     new_id = max((r.id for r in reminders), default=0) + 1
-    reminder = Reminder(new_id, event, user, remind_before)
+    reminder = Reminder(new_id, event, remind_before)
     reminders.append(reminder)
     return reminder
 

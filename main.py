@@ -36,13 +36,8 @@ def create_new_reminder(
     if event is None:
         print("Событие не найдено.")
         return
-    user_id = input_int("id пользователя: ")
-    user = storage.find_user_by_id(users, user_id)
-    if user is None:
-        print("Пользователь не найден.")
-        return
     remind_before = input_int("Напомнить за сколько дней: ")
-    reminder = add_reminder(reminders, event, user, remind_before)
+    reminder = add_reminder(reminders, event, remind_before)
     if reminder is None:
         print("Некорректный срок напоминания.")
         return

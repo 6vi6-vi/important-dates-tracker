@@ -14,7 +14,7 @@ class Reminder(models.Model):
         COMPLETED = "completed", "Завершено"
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="reminders", verbose_name="Событие")
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="reminders", verbose_name="Пользователь")
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="reminders", verbose_name="Пользователь", blank=True, null=True)
     remind_before = models.PositiveIntegerField(verbose_name="За сколько дней напомнить")
     is_sent = models.BooleanField(default=False, verbose_name="Отправлено")
     slug = models.SlugField(max_length=200, unique=True, editable=False, verbose_name="URL-идентификатор")
@@ -45,6 +45,9 @@ class Reminder(models.Model):
         return "Активно"
 
     def save(self, *args, **kwargs):
+        if not self.user and self.event:
+            self.user = self.event.user
+
         if not self.slug:
             base_slug = slugify(unidecode(self.event.title)) or "reminder"
             if self.pk:

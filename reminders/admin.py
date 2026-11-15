@@ -7,7 +7,7 @@ from django.utils.html import format_html
 class ReminderAdminForm(forms.ModelForm):
     class Meta:
         model = Reminder
-        fields = "__all__"
+        exclude = ("user",)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -21,7 +21,7 @@ class ReminderAdminForm(forms.ModelForm):
 class ReminderInline(admin.TabularInline):
     model = Reminder
     form = ReminderAdminForm
-    fields = ("user", "remind_before", "is_sent", "status")
+    fields = ("remind_before", "is_sent", "status")
     extra = 0
     can_delete = False
 
@@ -30,7 +30,7 @@ class ReminderInline(admin.TabularInline):
 class ReminderAdmin(admin.ModelAdmin):
     form = ReminderAdminForm
     list_display = ("id", "event", "user", "remind_before", "is_sent", "display_current_status", "site_link")
-    list_display_links = ("id",)
+    list_display_links = ("id", "event")
     search_fields = ("event__title", "user__name")
     list_filter = ("status", "is_sent")
     ordering = ("-id",)
