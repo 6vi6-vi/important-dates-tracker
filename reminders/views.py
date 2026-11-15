@@ -1,7 +1,6 @@
 from datetime import date
 from django.core.paginator import Paginator
-from django.db.models import Q
-from django.db.models import Count
+from django.db.models import Q, Count
 from django.shortcuts import get_object_or_404, render
 from reminders.models import Reminder
 from users.models import User
@@ -15,11 +14,14 @@ def reminders(request):
     today = date.today()
 
     if filter_type == "active":
-        queryset = queryset.filter(is_active=True, event__event_date__gte=today)
+        queryset = queryset.filter(
+            status=Reminder.Status.ACTIVE,
+            event__event_date__gte=today
+        )
     elif filter_type == "past":
         queryset = queryset.filter(event__event_date__lt=today)
     elif filter_type == "inactive":
-        queryset = queryset.filter(is_active=False)
+        queryset = queryset.filter(status=Reminder.Status.CANCELLED)
 
     if query:
         queryset = queryset.filter(
@@ -37,7 +39,11 @@ def reminders(request):
         days_left = (reminder.event.event_date - today).days
         reminder.is_past = days_left < 0
         reminder.days_left = days_left
-        reminder.is_due = 0 <= days_left <= reminder.remind_before and reminder.is_active and not reminder.is_sent
+        reminder.is_due = (
+            0 <= days_left <= reminder.remind_before
+            and reminder.status == Reminder.Status.ACTIVE
+            and not reminder.is_sent
+        )
 
     paginator = Paginator(queryset, 5)
     page_number = request.GET.get("page")
@@ -60,7 +66,11 @@ def reminder_detail(request, reminder_id):
         "reminder": reminder,
         "days_left": days_left,
         "is_past": days_left < 0,
-        "is_due": 0 <= days_left <= reminder.remind_before and reminder.is_active and not reminder.is_sent,
+        "is_due": (
+            0 <= days_left <= reminder.remind_before
+            and reminder.status == Reminder.Status.ACTIVE
+            and not reminder.is_sent
+        ),
     })
 
 
@@ -68,7 +78,7 @@ def statistics(request):
     stats = User.objects.annotate(
         reminders_count=Count('reminders')
     ).order_by("-reminders_count")
-    active_count = Reminder.objects.filter(is_active=True).count()
+    active_count = Reminder.objects.filter(status=Reminder.Status.ACTIVE).count()
 
     return render(request, "reminders/statistics.html", {
         "statistics": stats,
