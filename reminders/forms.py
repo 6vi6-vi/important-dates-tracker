@@ -1,20 +1,17 @@
 from django import forms
 from users.models import User
+from events.models import Event
 from reminders.models import Reminder
 from datetime import date
 from django.core.exceptions import ValidationError
 
 
 class ReminderFilterForm(forms.Form):
-    status = forms.ChoiceField(
+    event = forms.ModelChoiceField(
+        queryset=Event.objects.order_by("title"),
         required=False,
-        label="Тип напоминания",
-        choices=[
-            ("", "Все"),
-            ("active", "Активные"),
-            ("past", "Завершённые"),
-            ("inactive", "Отменённые"),
-        ]
+        label="Событие",
+        empty_label="Все события"
     )
     user = forms.ModelChoiceField(
         queryset=User.objects.order_by("name"),
