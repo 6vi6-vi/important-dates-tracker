@@ -5,7 +5,10 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Напоминания</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Напоминания</h1>
+        <a href="{% url 'reminders:create' %}" class="btn btn-success">+ Добавить напоминание</a>
+    </div>
 
     <form method="get" class="booking-filter-form mb-4 p-3 bg-light border rounded">
         <div class="row g-3 align-items-end">

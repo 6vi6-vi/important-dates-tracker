@@ -1,10 +1,11 @@
 from datetime import date
 from django.core.paginator import Paginator
 from django.db.models import Count
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from reminders.models import Reminder
 from users.models import User
-from .forms import ReminderFilterForm
+from .forms import ReminderFilterForm, ReminderForm
+from django.views.decorators.http import require_POST
 
 
 def reminders(request):
@@ -77,6 +78,37 @@ def reminder_detail(request, slug):
             and not reminder.is_sent
         ),
     })
+
+
+def reminder_create(request):
+    if request.method == "POST":
+        form = ReminderForm(request.POST)
+        if form.is_valid():
+            reminder = form.save()
+            return redirect("reminders:detail", slug=reminder.slug)
+    else:
+        form = ReminderForm()
+    return render(request, "reminders/reminder_form.html", {"form": form})
+
+
+def reminder_update(request, slug):
+    reminder = get_object_or_404(Reminder, slug=slug)
+    if request.method == "POST":
+        form = ReminderForm(request.POST, instance=reminder)
+        if form.is_valid():
+            form.save()
+            return redirect("reminders:detail", slug=reminder.slug)
+    else:
+        form = ReminderForm(instance=reminder)
+    return render(request, "reminders/reminder_form.html", {"form": form, "reminder": reminder})
+
+
+@require_POST
+def reminder_cancel(request, slug):
+    reminder = get_object_or_404(Reminder.objects.filter(status=Reminder.Status.ACTIVE), slug=slug)
+    reminder.status = Reminder.Status.CANCELLED
+    reminder.save()
+    return redirect("reminders:list")
 
 
 def statistics(request):

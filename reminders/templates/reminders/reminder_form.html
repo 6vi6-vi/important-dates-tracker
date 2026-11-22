@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if reminder %}Редактирование{% else %}Создание{% endif %} напоминания
+{% endblock %}
+
+{% block content %}
+    <h1>{% if reminder %}Редактирование{% else %}Создание{% endif %} напоминания</h1>
+    
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="mb-3">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary">
+            {% if reminder %}Сохранить изменения{% else %}Создать{% endif %}
+        </button>
+        <a href="{% url 'reminders:list' %}" class="btn btn-outline-secondary">Отмена</a>
+    </form>
+{% endblock %}
