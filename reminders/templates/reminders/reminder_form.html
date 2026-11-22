@@ -9,6 +9,11 @@
     
     <form method="post" class="mt-4">
         {% csrf_token %}
+        
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+
         {% for field in form %}
             <div class="mb-3">
                 {{ field.label_tag }}
@@ -20,9 +25,6 @@
                     <div class="text-danger">{{ error }}</div>
                 {% endfor %}
             </div>
-        {% endfor %}
-        {% for error in form.non_field_errors %}
-            <div class="alert alert-danger">{{ error }}</div>
         {% endfor %}
         
         <button type="submit" class="btn btn-primary">

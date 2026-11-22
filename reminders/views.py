@@ -87,7 +87,7 @@ def reminder_create(request):
             reminder = form.save()
             return redirect("reminders:detail", slug=reminder.slug)
     else:
-        form = ReminderForm()
+        form = ReminderForm(initial={"remind_before": 7})
     return render(request, "reminders/reminder_form.html", {"form": form})
 
 

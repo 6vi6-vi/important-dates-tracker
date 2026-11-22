@@ -35,6 +35,10 @@ class ReminderForm(forms.ModelForm):
             "event": "Событие",
             "remind_before": "За сколько дней напомнить",
         }
+        help_texts = {
+            "event": "Выберите событие, о котором нужно напомнить.",
+            "remind_before": "Укажите количество дней до события (например, 7).",
+        }
         widgets = {
             "remind_before": forms.NumberInput(attrs={"class": "form-control"}),
         }
