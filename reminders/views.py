@@ -10,15 +10,16 @@ from django.views.decorators.http import require_POST
 
 def reminders(request):
     form = ReminderFilterForm(request.GET or None)
-
     queryset = Reminder.objects.select_related("event", "user")
     today = date.today()
 
     sort = "date"
+    filter_type = "all"
 
     if form.is_bound and form.is_valid():
         selected_event = form.cleaned_data.get("event")
         selected_user = form.cleaned_data.get("user")
+        filter_type = form.cleaned_data.get("status") or "all"
         sort = form.cleaned_data.get("sort") or "date"
 
         if selected_event:
@@ -26,7 +27,6 @@ def reminders(request):
         if selected_user:
             queryset = queryset.filter(user=selected_user)
 
-    filter_type = request.GET.get("filter", "all")
     if filter_type == "active":
         queryset = queryset.filter(status=Reminder.Status.ACTIVE, event__event_date__gte=today)
     elif filter_type == "past":
@@ -57,7 +57,6 @@ def reminders(request):
         "reminders": page_obj,
         "page_obj": page_obj,
         "form": form,
-        "filter_type": filter_type,
     })
 
 

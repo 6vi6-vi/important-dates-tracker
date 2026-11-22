@@ -23,7 +23,6 @@
         <a href="{% url 'reminders:update' reminder.slug %}" class="btn btn-sm btn-outline-primary">
             Редактировать
         </a>
-
         {% if reminder.current_status == 'active' %}
         <form method="post" action="{% url 'reminders:cancel' reminder.slug %}">
             {% csrf_token %}

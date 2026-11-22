@@ -10,42 +10,31 @@
         <a href="{% url 'reminders:create' %}" class="btn btn-success">+ Добавить напоминание</a>
     </div>
 
-    <form method="get" class="booking-filter-form mb-4 p-3 bg-light border rounded">
+    <form method="get" class="p-3 bg-light border rounded mb-4">
         <div class="row g-3 align-items-end">
-            <div class="col-md-4">
-                {{ form.event.label_tag }}
-                {{ form.event }}
+            <div class="col-md-3">
+                {{ form.status.label_tag }}
+                {{ form.status }}
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 {{ form.user.label_tag }}
                 {{ form.user }}
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 {{ form.sort.label_tag }}
                 {{ form.sort }}
             </div>
-            <div class="col-md-2">
-                <input type="hidden" name="filter" value="{{ filter_type }}">
+            <div class="col-md-3">
                 <button type="submit" class="btn btn-primary w-100">Применить</button>
             </div>
         </div>
+
+        {% if request.GET %}
+            <div class="mt-2 text-end">
+                <a href="{% url 'reminders:list' %}" class="text-decoration-none small">Сбросить все фильтры</a>
+            </div>
+        {% endif %}
     </form>
-
-    <div class="mb-3">
-        <a href="?filter=all&sort={{ sort }}&q={{ search_query }}" class="btn btn-sm {% if filter_type == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">Все</a>
-        <a href="?filter=active&sort={{ sort }}&q={{ search_query }}" class="btn btn-sm {% if filter_type == 'active' %}btn-success{% else %}btn-outline-success{% endif %}">Активные</a>
-        <a href="?filter=past&sort={{ sort }}&q={{ search_query }}" class="btn btn-sm {% if filter_type == 'past' %}btn-dark{% else %}btn-outline-dark{% endif %}">Просроченные</a>
-        <a href="?filter=inactive&sort={{ sort }}&q={{ search_query }}" class="btn btn-sm {% if filter_type == 'inactive' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">Отменённые</a>
-    </div>
-
-    <div class="mb-4 d-flex align-items-center">
-        <span class="me-2 text-muted">Сортировать по:</span>
-        <div class="btn-group btn-group-sm">
-            <a href="?filter={{ filter_type }}&sort=date&q={{ search_query }}" class="btn {% if sort == 'date' %}btn-primary{% else %}btn-outline-primary{% endif %}">Дате (сначала ближайшие)</a>
-            <a href="?filter={{ filter_type }}&sort=date_desc&q={{ search_query }}" class="btn {% if sort == 'date_desc' %}btn-primary{% else %}btn-outline-primary{% endif %}">Дате (сначала дальние)</a>
-            <a href="?filter={{ filter_type }}&sort=title&q={{ search_query }}" class="btn {% if sort == 'title' %}btn-primary{% else %}btn-outline-primary{% endif %}">Названию</a>
-        </div>
-    </div>
 
     <p>Всего найдено: {{ page_obj.paginator.count }}</p>
 
@@ -62,7 +51,7 @@
         <ul class="pagination justify-content-center">
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?filter={{ filter_type }}&sort={{ sort }}&q={{ search_query }}&page={{ page_obj.previous_page_number }}">Назад</a>
+                    <a class="page-link" href="{% querystring page=page_obj.previous_page_number %}">Назад</a>
                 </li>
             {% else %}
                 <li class="page-item disabled"><span class="page-link">Назад</span></li>
@@ -73,14 +62,14 @@
                     <li class="page-item active"><span class="page-link">{{ page_number }}</span></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="?filter={{ filter_type }}&sort={{ sort }}&q={{ search_query }}&page={{ page_number }}">{{ page_number }}</a>
+                        <a class="page-link" href="{% querystring page=page_number %}">{{ page_number }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?filter={{ filter_type }}&sort={{ sort }}&q={{ search_query }}&page={{ page_obj.next_page_number }}">Далее</a>
+                    <a class="page-link" href="{% querystring page=page_obj.next_page_number %}">Далее</a>
                 </li>
             {% else %}
                 <li class="page-item disabled"><span class="page-link">Далее</span></li>
