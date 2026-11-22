@@ -8,11 +8,21 @@
     <div class="card">
         <div class="card-body">
             <h1 class="card-title">{{ event.title }}</h1>
-            <p class="card-text"><strong>Дата:</strong> {{ event.event_date }}</p>
+
+            {% if event.image %}
+                <img src="{{ event.image.url }}" alt="{{ event.title }}" class="img-fluid mb-3 rounded" style="max-height: 300px; object-fit: cover;">
+            {% endif %}
+
+            <p class="card-text"><strong>Дата:</strong> {{ event.event_date }} ({{ event.weekday_name }})</p>
             <p class="card-text"><strong>Категория:</strong> {{ event.category.name }}</p>
             <p class="card-text"><strong>Пользователь:</strong> {{ event.user.name }}</p>
             <p class="card-text"><strong>Тип:</strong> {% if event.is_recurring %}Ежегодное{% else %}Одноразовое{% endif %}</p>
         </div>
     </div>
-    <a href="{% url 'events:list' %}" class="btn btn-outline-secondary mt-3">← к списку событий</a>
+    
+    <div class="mt-3">
+        <a href="{% url 'events:update' event.slug %}" class="btn btn-warning">Редактировать</a>
+        
+        <a href="{% url 'events:list' %}" class="btn btn-outline-secondary">← к списку событий</a>
+    </div>
 {% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if event %}Редактирование{% else %}Создание{% endif %} события
+{% endblock %}
+
+{% block content %}
+    <h1>{% if event %}Редактирование{% else %}Создание{% endif %} события</h1>
+    
+    <form method="post" enctype="multipart/form-data" class="mt-4">
+        {% csrf_token %}
+        
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+
+        {% for field in form %}
+            <div class="mb-3">
+                {{ field.label_tag }}
+                {{ field }}
+                
+                {% if field.help_text %}
+                    <div class="form-text text-muted">{{ field.help_text }}</div>
+                {% endif %}
+                
+                {% for error in field.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary">
+            {% if event %}Сохранить изменения{% else %}Создать{% endif %}
+        </button>
+        <a href="{% url 'events:list' %}" class="btn btn-outline-secondary">Отмена</a>
+    </form>
+{% endblock %}

@@ -42,6 +42,12 @@ class Event(models.Model):
         db_persist=True,
         verbose_name="День недели (код)"
     )
+    image = models.ImageField(
+        upload_to="events/",
+        blank=True,
+        null=True,
+        verbose_name="Изображение события"
+    )
 
     @property
     def weekday_name(self):
