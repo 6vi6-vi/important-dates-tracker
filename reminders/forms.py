@@ -2,6 +2,8 @@ from django import forms
 from users.models import User
 from events.models import Event
 from reminders.models import Reminder
+from datetime import date
+from django.core.exceptions import ValidationError
 
 
 class ReminderFilterForm(forms.Form):
@@ -48,3 +50,9 @@ class ReminderForm(forms.ModelForm):
         if value < 1:
             raise forms.ValidationError("Срок напоминания должен быть больше 0 дней.")
         return value
+
+    def clean_event(self):
+        event = self.cleaned_data["event"]
+        if event.event_date < date.today():
+            raise ValidationError("Нельзя создать напоминание для события, которое уже прошло.")
+        return event
