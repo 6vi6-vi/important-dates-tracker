@@ -1,18 +1,31 @@
 from datetime import date
 from django.core.paginator import Paginator
-from django.db.models import Q, Count
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, render
 from reminders.models import Reminder
 from users.models import User
+from .forms import ReminderFilterForm
 
 
 def reminders(request):
-    filter_type = request.GET.get("filter", "all")
-    sort = request.GET.get("sort", "date")
-    query = request.GET.get("q", "").strip()
+    form = ReminderFilterForm(request.GET or None)
+
     queryset = Reminder.objects.select_related("event", "user")
     today = date.today()
 
+    sort = "date"
+
+    if form.is_bound and form.is_valid():
+        selected_event = form.cleaned_data.get("event")
+        selected_user = form.cleaned_data.get("user")
+        sort = form.cleaned_data.get("sort") or "date"
+
+        if selected_event:
+            queryset = queryset.filter(event=selected_event)
+        if selected_user:
+            queryset = queryset.filter(user=selected_user)
+
+    filter_type = request.GET.get("filter", "all")
     if filter_type == "active":
         queryset = queryset.filter(status=Reminder.Status.ACTIVE, event__event_date__gte=today)
     elif filter_type == "past":
@@ -20,15 +33,8 @@ def reminders(request):
     elif filter_type == "inactive":
         queryset = queryset.filter(status=Reminder.Status.CANCELLED)
 
-    if query:
-        queryset = queryset.filter(
-            Q(event__title__icontains=query) | Q(user__name__icontains=query)
-        )
-
     if sort == "title":
         queryset = queryset.order_by("event__title")
-    elif sort == "date_desc":
-        queryset = queryset.order_by("-event__event_date")
     else:
         queryset = queryset.order_by("event__event_date")
 
@@ -49,9 +55,8 @@ def reminders(request):
     return render(request, "reminders/reminder_list.html", {
         "reminders": page_obj,
         "page_obj": page_obj,
+        "form": form,
         "filter_type": filter_type,
-        "sort": sort,
-        "search_query": query,
     })
 
 

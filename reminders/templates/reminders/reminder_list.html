@@ -7,15 +7,25 @@
 {% block content %}
     <h1>Напоминания</h1>
 
-    <form method="get" class="mb-4 d-flex">
-        <input type="text" name="q" class="form-control me-2" placeholder="Поиск по событию или пользователю..." value="{{ search_query }}">
-        <input type="hidden" name="filter" value="{{ filter_type }}">
-        <input type="hidden" name="sort" value="{{ sort }}">
-        
-        <button type="submit" class="btn btn-primary">Найти</button>
-        {% if search_query %}
-            <a href="?filter={{ filter_type }}&sort={{ sort }}" class="btn btn-outline-secondary ms-2">Сбросить</a>
-        {% endif %}
+    <form method="get" class="booking-filter-form mb-4 p-3 bg-light border rounded">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                {{ form.event.label_tag }}
+                {{ form.event }}
+            </div>
+            <div class="col-md-4">
+                {{ form.user.label_tag }}
+                {{ form.user }}
+            </div>
+            <div class="col-md-2">
+                {{ form.sort.label_tag }}
+                {{ form.sort }}
+            </div>
+            <div class="col-md-2">
+                <input type="hidden" name="filter" value="{{ filter_type }}">
+                <button type="submit" class="btn btn-primary w-100">Применить</button>
+            </div>
+        </div>
     </form>
 
     <div class="mb-3">
