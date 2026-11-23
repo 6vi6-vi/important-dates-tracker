@@ -7,7 +7,7 @@
 {% block content %}
     <h1>{% if reminder %}Редактирование{% else %}Создание{% endif %} напоминания</h1>
     
-    <form method="post" class="mt-4">
+    <form method="post" class="mt-4" novalidate>
         {% csrf_token %}
         
         {% for error in form.non_field_errors %}
